@@ -17,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
+    private static final String AUTH_LOGIN_PATH = "/auth/login";
+    private static final String AUTH_REGISTER_PATH = "/auth/register";
+
     @Autowired
     SecurityFilter securityFilter;
 
@@ -26,8 +29,8 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, AUTH_LOGIN_PATH).permitAll()
+                        .requestMatchers(HttpMethod.POST, AUTH_REGISTER_PATH).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

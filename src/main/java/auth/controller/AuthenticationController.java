@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,12 +36,13 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
+        UsernamePasswordAuthenticationToken userPassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+        
+        Authentication auth = this.authenticationManager.authenticate(userPassword);
 
-        var token = tokenService.generateToken((User) auth.getPrincipal());
+        String token = tokenService.generateToken((User) auth.getPrincipal());
 
-        kafkaTemplate.send("product-topic", token);
+        kafkaTemplate.send("auth-topic", token);
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
